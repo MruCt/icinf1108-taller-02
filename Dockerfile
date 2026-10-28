@@ -4,13 +4,14 @@ FROM python:3.13-slim AS build
 WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no.cache
+RUN uv sync --frozen --no-cache
 
 #Etapa 2: Genereación del dev (el sistema de desarrollo que estará en nuestro
 # computador y que permitirá las dependencias necesarias de uv para el entorno de la imagen)
 FROM python:3.13-slim AS dev
 WORKDIR /app
-COPY --from=build /app/.venv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=build /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 COPY . .
 EXPOSE 3000

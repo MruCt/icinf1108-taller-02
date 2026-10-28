@@ -487,3 +487,9 @@ tsconfig.tsbuildinfo
 
 # Solución de referencia de la actividad Docker (no versionar)
 solucion/
+
+# Python testing
+.pytest_cache/
+
+# Configuración local de VS Code
+.vscode/settings.json

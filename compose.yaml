@@ -9,6 +9,7 @@ services:
       - "3000:3000"
     volumes:
       - .:/app
+      - app_venv:/app/.venv
     env_file:
       - .env
     depends_on:
@@ -36,3 +37,4 @@ services:
 
 volumes:
   pgdata:
+  app_venv:
