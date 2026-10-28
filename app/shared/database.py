@@ -1,41 +1,28 @@
-
 import os
-from collections.abc import Iterator
-from contextlib import contextmanager
-
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
+load_dotenv()
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise RuntimeError("La variable DATABASE_URL no está configurada.")
-
-
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
+DATABASE_URL = os.getenv("DATABASE_URL", "").replace(
+    "postgresql://", "postgresql+psycopg://", 1
 )
 
-
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    expire_on_commit=False,
-)
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
 class Base(DeclarativeBase):
     pass
 
 
-@contextmanager
-def session_scope(session: Session | None = None) -> Iterator[Session]:
-    if session is not None:
-        # La transacción pertenece al servicio que creó esta sesión.
-        yield session
-    else:
-        # Para operaciones independientes, gestionamos la transacción aquí.
-        with SessionLocal.begin() as new_session:
-            yield new_session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
