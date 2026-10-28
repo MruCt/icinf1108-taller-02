@@ -34,7 +34,4 @@ def update(studentId: str, body: UpdateStudentDto) -> Student:
 
 @router.delete("/{studentId}")
 def delete(studentId: str) -> Student:
-    deleted = students_service.delete(studentId)
-    pets_service.delete_all_for_student(studentId)
-
-    return deleted
+    return students_service.delete(studentId)
